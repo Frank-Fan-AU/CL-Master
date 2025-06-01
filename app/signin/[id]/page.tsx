@@ -56,19 +56,34 @@ export default async function SignIn({
   }
 
   return (
-    <div className="flex justify-center height-screen-helper">
-      <div className="flex flex-col justify-between max-w-lg p-3 m-auto w-80 ">
-        <div className="flex justify-center ">
-          <Logo width="64px" height="64px" />
+    <div className="flex  items-start justify-center mt-12 bg-gray-50 px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md space-y-2">
+        <div className="flex flex-col items-center">
+          <Logo width="48px" height="48px" />
         </div>
-        <Card>
-          <CardHeader>
-            <CardTitle>Sign In</CardTitle>
-            <CardDescription>
-              Sign in to your account.
+
+        <Card className="w-full">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-center text-xl">
+              {viewProp === 'forgot_password'
+                ? 'Reset your password'
+                : viewProp === 'update_password'
+                  ? 'Update your password'
+                  : viewProp === 'signup'
+                    ? 'Create your account'
+                    : 'Welcome back'}
+            </CardTitle>
+            <CardDescription className="text-center text-sm">
+              {viewProp === 'forgot_password'
+                ? 'Enter your email to reset your password'
+                : viewProp === 'update_password'
+                  ? 'Enter your new password'
+                  : viewProp === 'signup'
+                    ? 'Fill in your details to get started'
+                    : 'Sign in to your account'}
             </CardDescription>
           </CardHeader>
-          <CardFooter>
+          <div className="px-6 pb-6">
             {viewProp === 'password_signin' && (
               <PasswordSignIn
                 allowEmail={allowEmail}
@@ -103,7 +118,7 @@ export default async function SignIn({
                   <OauthSignIn />
                 </>
               )}
-          </CardFooter>
+          </div>
         </Card>
       </div>
     </div>
