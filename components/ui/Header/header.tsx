@@ -1,7 +1,14 @@
 import { CircleIcon } from "lucide-react";
 import Link from "next/link";
+import Navlinks from "../Navbar/Navlinks";
+import { createClient } from "@/utils/supabase/server";
 
-export function Header() {  
+export async function Header() {  
+  const supabase = createClient();
+
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
     return (
         <header className="border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
@@ -12,7 +19,7 @@ export function Header() {
               </Link>
               <nav className="flex space-x-6">
                 <Link 
-                  href="/job-coverletter" 
+                  href="/job-cover-letter" 
                   className="text-sm font-medium text-gray-700 hover:text-gray-900"
                 >
                   Job Cover Letter
@@ -26,7 +33,9 @@ export function Header() {
               </nav>
             </div>
             <div className="flex items-center space-x-4">
-              
+            <div className="max-w-6xl px-6 mx-auto">
+        <Navlinks user={user} />
+      </div>
             </div>
           </div>
         </header>

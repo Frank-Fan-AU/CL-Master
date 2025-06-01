@@ -1,11 +1,12 @@
 'use client';
 
-import Button from '@/components/ui/Button';
+
 import Link from 'next/link';
 import { requestPasswordUpdate } from '@/utils/auth-helpers/server';
 import { handleRequest } from '@/utils/auth-helpers/client';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { Button } from '../button';
 
 // Define prop type with allowEmail boolean
 interface ForgotPasswordProps {
@@ -50,10 +51,10 @@ export default function ForgotPassword({
             />
           </div>
           <Button
-            variant="slim"
+     
             type="submit"
             className="mt-1"
-            loading={isSubmitting}
+            
             disabled={disableButton}
           >
             Send Email

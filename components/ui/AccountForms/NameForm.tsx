@@ -1,7 +1,7 @@
 'use client';
 
-import Button from '@/components/ui/Button';
-import Card from '@/components/ui/Card';
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { updateName } from '@/utils/auth-helpers/server';
 import { handleRequest } from '@/utils/auth-helpers/client';
 import { useRouter } from 'next/navigation';
@@ -14,7 +14,7 @@ export default function NameForm({ userName }: { userName: string }) {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     setIsSubmitting(true);
     // Check if the new name is the same as the old name
-    if (e.currentTarget.fullName.value === userName) {
+    if (e.currentTarget.newName.value === userName) {
       e.preventDefault();
       setIsSubmitting(false);
       return;
@@ -24,35 +24,35 @@ export default function NameForm({ userName }: { userName: string }) {
   };
 
   return (
-    <Card
-      title="Your Name"
-      description="Please enter your full name, or a display name you are comfortable with."
-      footer={
-        <div className="flex flex-col items-start justify-between sm:flex-row sm:items-center">
-          <p className="pb-4 sm:pb-0">64 characters maximum</p>
-          <Button
-            variant="slim"
-            type="submit"
-            form="nameForm"
-            loading={isSubmitting}
-          >
-            Update Name
-          </Button>
-        </div>
-      }
-    >
-      <div className="mt-8 mb-4 text-xl font-semibold">
-        <form id="nameForm" onSubmit={(e) => handleSubmit(e)}>
+    <Card>
+      <CardHeader>
+        <CardTitle>Update Name</CardTitle>
+        <CardDescription>
+          Update your name.
+        </CardDescription>
+      </CardHeader>
+      <form id="nameForm" onSubmit={handleSubmit}>
+        <div className="p-6">
           <input
             type="text"
-            name="fullName"
-            className="w-1/2 p-3 rounded-md bg-zinc-800"
-            defaultValue={userName}
+            name="newName"
+            className="w-full p-3 rounded-md bg-zinc-800"
+            defaultValue={userName ?? ''}
             placeholder="Your name"
             maxLength={64}
           />
-        </form>
-      </div>
+        </div>
+        <CardFooter>
+          <Button
+            variant="secondary"
+            type="submit"
+            form="nameForm"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Loading...' : 'Update Name'}
+          </Button>
+        </CardFooter>
+      </form>
     </Card>
   );
 }

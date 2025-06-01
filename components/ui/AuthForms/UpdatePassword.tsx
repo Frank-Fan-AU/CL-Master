@@ -1,10 +1,10 @@
 'use client';
 
-import Button from '@/components/ui/Button';
 import { updatePassword } from '@/utils/auth-helpers/server';
 import { handleRequest } from '@/utils/auth-helpers/client';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
+import { Button } from '../button';
 
 interface UpdatePasswordProps {
   redirectMethod: string;
@@ -51,10 +51,10 @@ export default function UpdatePassword({
             />
           </div>
           <Button
-            variant="slim"
+
             type="submit"
             className="mt-1"
-            loading={isSubmitting}
+
           >
             Update Password
           </Button>

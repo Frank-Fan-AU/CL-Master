@@ -1,11 +1,13 @@
 'use client';
 
-import Button from '@/components/ui/Button';
+
 import Link from 'next/link';
 import { signInWithPassword } from '@/utils/auth-helpers/server';
 import { handleRequest } from '@/utils/auth-helpers/client';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 // Define prop type with allowEmail boolean
 interface PasswordSignInProps {
@@ -35,51 +37,35 @@ export default function PasswordSignIn({
       >
         <div className="grid gap-2">
           <div className="grid gap-1">
-            <label htmlFor="email">Email</label>
-            <input
-              id="email"
-              placeholder="name@example.com"
-              type="email"
-              name="email"
-              autoCapitalize="none"
-              autoComplete="email"
-              autoCorrect="off"
-              className="w-full p-3 rounded-md bg-zinc-800"
-            />
-            <label htmlFor="password">Password</label>
-            <input
-              id="password"
-              placeholder="Password"
-              type="password"
-              name="password"
-              autoComplete="current-password"
-              className="w-full p-3 rounded-md bg-zinc-800"
-            />
+            <label htmlFor="email" className="text-gray-900">Email</label>
+           <Input name='email' placeholder='name@example.com' type='email' autoCapitalize='none' autoComplete='email' autoCorrect='off' className='w-full p-3 rounded-md '/>
+            <label htmlFor="password" className="text-gray-900">Password</label>
+           <Input name='password' placeholder='Password' type='password' autoComplete='current-password' className='w-full p-3 rounded-md '/>
           </div>
           <Button
-            variant="slim"
+
             type="submit"
             className="mt-1"
-            loading={isSubmitting}
+
           >
             Sign in
           </Button>
         </div>
       </form>
       <p>
-        <Link href="/signin/forgot_password" className="font-light text-sm">
+        <Link href="/signin/forgot_password" className="font-light text-sm text-gray-900">
           Forgot your password?
         </Link>
       </p>
       {allowEmail && (
         <p>
-          <Link href="/signin/email_signin" className="font-light text-sm">
+          <Link href="/signin/email_signin" className="font-light text-sm text-gray-900">
             Sign in via magic link
           </Link>
         </p>
       )}
       <p>
-        <Link href="/signin/signup" className="font-light text-sm">
+        <Link href="/signin/signup" className="font-light text-sm text-gray-900">
           Don't have an account? Sign up
         </Link>
       </p>
