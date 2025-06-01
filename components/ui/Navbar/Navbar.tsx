@@ -1,15 +1,32 @@
-import { createClient } from '@/utils/supabase/server';
+'use client';
+
+import { createClient } from '@/utils/supabase/client';
 import s from './Navbar.module.css';
 import Navlinks from './Navlinks';
 import Link from 'next/link';
 import { CircleIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
-export default async function Navbar() {
+export default function Navbar() {
+  const [user, setUser] = useState<any>(null);
   const supabase = createClient();
 
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+
+    getUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [supabase.auth]);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200">
@@ -27,12 +44,12 @@ export default async function Navbar() {
               >
                 Job Cover Letter
               </Link>
-              <Link 
+              {/* <Link 
                 href="/rent-coverletter" 
                 className="text-sm font-medium text-gray-700 hover:text-gray-900"
               >
                 Rent Cover Letter
-              </Link>
+              </Link> */}
             </div>
           </div>
           <div className="flex items-center space-x-4">

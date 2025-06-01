@@ -1,19 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-
 import { Textarea } from '@/components/ui/textarea';
-
 import { Loader2, Check } from 'lucide-react';
 import { Input } from './ui/input';
 import { Card } from './ui/card';
+import { createClient } from '@/utils/supabase/client';
+import { useRouter } from 'next/navigation';
 
 export default function JobCoverLetterForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [generatedLetter, setGeneratedLetter] = useState('');
   const [error, setError] = useState('');
   const [isCopied, setIsCopied] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const router = useRouter();
+  const supabase = createClient();
+
   const [formData, setFormData] = useState({
     companyName: '',
     location: '',
@@ -21,8 +25,30 @@ export default function JobCoverLetterForm() {
     emphasis: ''
   });
 
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setIsLoggedIn(!!user);
+    };
+
+    checkUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session?.user);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [supabase.auth]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isLoggedIn) {
+      router.push('/signin');
+      return;
+    }
+
     setIsLoading(true);
     setError('');
     
@@ -53,7 +79,7 @@ export default function JobCoverLetterForm() {
   const handleCopy = async () => {
     await navigator.clipboard.writeText(generatedLetter);
     setIsCopied(true);
-    setTimeout(() => setIsCopied(false), 2000); // 2秒后重置状态
+    setTimeout(() => setIsCopied(false), 2000);
   };
 
   return (
@@ -82,6 +108,7 @@ export default function JobCoverLetterForm() {
               value={formData.location}
               onChange={(e) => setFormData({ ...formData, location: e.target.value })}
               placeholder="Enter job location"
+              className="text-gray-900"
               required
             />
           </div>
@@ -115,16 +142,30 @@ export default function JobCoverLetterForm() {
           />
         </div>
 
-        <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Generating...
-            </>
-          ) : (
-            'Generate Cover Letter'
-          )}
-        </Button>
+        {isLoggedIn ? (
+          <Button 
+            type="submit" 
+            className="w-full" 
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Generating...
+              </>
+            ) : (
+              'Generate Cover Letter'
+            )}
+          </Button>
+        ) : (
+          <Button 
+            type="button" 
+            className="w-full" 
+            onClick={() => router.push('/signin')}
+          >
+            Sign in to Generate
+          </Button>
+        )}
 
         {error && (
           <div className="text-red-500 text-sm text-center">

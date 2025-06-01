@@ -1,5 +1,6 @@
 import { OpenAI } from 'openai';
 import { NextResponse } from 'next/server';
+import { createClient } from '@/utils/supabase/server';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -9,6 +10,17 @@ const MAX_GUEST_GENERATIONS = 3;
 
 export async function POST(request: Request) {
   try {
+    // 检查用户是否登录
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Please sign in to generate cover letter' },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
     const { companyName, location, jobRequirements, emphasis } = body;
 
