@@ -1,11 +1,11 @@
 import { Metadata } from 'next';
 import Footer from '@/components/ui/Footer';
-import Navbar from '@/components/ui/Navbar';
+import { Header } from '@/components/ui/Header/header';
 import { Toaster } from '@/components/ui/Toasts/toaster';
 import { PropsWithChildren, Suspense } from 'react';
 import { getURL } from '@/utils/helpers';
 import 'styles/main.css';
-
+import { Manrope } from 'next/font/google';
 const title = 'Next.js Subscription Starter';
 const description = 'Brought to you by Vercel, Stripe, and Supabase.';
 
@@ -18,12 +18,16 @@ export const metadata: Metadata = {
     description: description
   }
 };
+const manrope = Manrope({ subsets: ['latin'] });
 
 export default async function RootLayout({ children }: PropsWithChildren) {
   return (
-    <html lang="en">
-      <body className="bg-black">
-        <Navbar />
+    <html
+    lang="en"
+    className={`bg-white dark:bg-gray-950 text-black dark:text-white ${manrope.className}`}
+  >
+      <body className="min-h-[100dvh] bg-gray-50">
+       <Header/>
         <main
           id="skip"
           className="min-h-[calc(100dvh-4rem)] md:min-h[calc(100dvh-5rem)]"

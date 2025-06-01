@@ -1,4 +1,4 @@
-import Pricing from '@/components/ui/Pricing/Pricing';
+
 import { createClient } from '@/utils/supabase/server';
 import {
   getProducts,
@@ -15,10 +15,6 @@ export default async function PricingPage() {
   ]);
 
   return (
-    <Pricing
-      user={user}
-      products={products ?? []}
-      subscription={subscription}
-    />
+    <div>home</div>
   );
 }
