@@ -9,12 +9,15 @@ import { Card } from './ui/card';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
 
+const FREE_GENERATION_KEY = 'has_free_generation';
+
 export default function JobCoverLetterForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [generatedLetter, setGeneratedLetter] = useState('');
   const [error, setError] = useState('');
   const [isCopied, setIsCopied] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [hasFreeGeneration, setHasFreeGeneration] = useState(true);
   const router = useRouter();
   const supabase = createClient();
 
@@ -24,6 +27,14 @@ export default function JobCoverLetterForm() {
     jobRequirements: '',
     emphasis: ''
   });
+
+  useEffect(() => {
+    // 从 localStorage 读取免费生成状态
+    const storedFreeGeneration = localStorage.getItem(FREE_GENERATION_KEY);
+    if (storedFreeGeneration === 'false') {
+      setHasFreeGeneration(false);
+    }
+  }, []);
 
   useEffect(() => {
     const checkUser = async () => {
@@ -44,7 +55,9 @@ export default function JobCoverLetterForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isLoggedIn) {
+    
+    // 如果用户未登录且已经使用过免费生成机会，则跳转到登录页面
+    if (!isLoggedIn && !hasFreeGeneration) {
       router.push('/signin');
       return;
     }
@@ -58,7 +71,10 @@ export default function JobCoverLetterForm() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          isFreeGeneration: !isLoggedIn && hasFreeGeneration
+        }),
       });
 
       const data = await response.json();
@@ -68,6 +84,12 @@ export default function JobCoverLetterForm() {
       }
 
       setGeneratedLetter(data.coverLetter);
+      
+      // 如果是未登录用户，标记已使用免费生成机会并保存到 localStorage
+      if (!isLoggedIn && hasFreeGeneration) {
+        setHasFreeGeneration(false);
+        localStorage.setItem(FREE_GENERATION_KEY, 'false');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate cover letter. Please try again.');
       console.error('Error:', err);
@@ -157,14 +179,39 @@ export default function JobCoverLetterForm() {
               'Generate Cover Letter'
             )}
           </Button>
+        ) : hasFreeGeneration ? (
+          <div className="space-y-2">
+            <Button 
+              type="submit" 
+              className="w-full" 
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Generating...
+                </>
+              ) : (
+                'Generate Free Cover Letter'
+              )}
+            </Button>
+            <p className="text-sm text-gray-500 text-center">
+              You have 1 free generation. Sign in to generate unlimited cover letters.
+            </p>
+          </div>
         ) : (
-          <Button 
-            type="button" 
-            className="w-full" 
-            onClick={() => router.push('/signin')}
-          >
-            Sign in to Generate
-          </Button>
+          <div className="space-y-2">
+            <Button 
+              type="button" 
+              className="w-full" 
+              onClick={() => router.push('/signin')}
+            >
+              Sign in to Generate More
+            </Button>
+            <p className="text-sm text-gray-500 text-center">
+              You've used your free generation. Sign in to generate more cover letters.
+            </p>
+          </div>
         )}
 
         {error && (
