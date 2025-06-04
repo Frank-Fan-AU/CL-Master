@@ -11,7 +11,7 @@ export async function POST(request: Request) {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
     
-    const { companyName, location, jobRequirements, emphasis, isFreeGeneration } = await request.json();
+    const { companyName, location, jobRequirements, emphasis, isFreeGeneration, userResume } = await request.json();
 
     // 如果用户未登录且不是免费生成，则返回错误
     if (!user && !isFreeGeneration) {
@@ -26,14 +26,16 @@ export async function POST(request: Request) {
     Location: ${location}
     Job Requirements: ${jobRequirements}
     Emphasis: ${emphasis}
+    ${userResume ? `Candidate's Resume: ${userResume}` : ''}
 
     Requirements:
     1. Keep it professional and concise
-    2. Highlight relevant experience and skills
+    2. Highlight relevant experience and skills from the resume
     3. Show enthusiasm for the role
     4. Include a clear call to action
     5. Format it properly with paragraphs
-    6. Keep it under 400 words`;
+    6. Keep it under 400 words
+    7. If the company is not in the candidate's current location, mention willingness to relocate`;
 
     const completion = await openai.chat.completions.create({
       messages: [{ role: "user", content: prompt }],

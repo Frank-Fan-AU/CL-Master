@@ -1,6 +1,7 @@
 
 import JobCoverLetterForm from '@/components/job-cover-letter-form';
 import { Metadata } from 'next';
+import Link from 'next/link';
 // import { JobCoverLetterForm } from '@/components/job-cover-letter-form';
 
 export const metadata: Metadata = {
@@ -14,7 +15,7 @@ export default function JobCoverLetterPage() {
       <div className="max-w-3xl mx-auto">
         <h1 className="text-3xl font-bold mb-2 text-gray-900">Job Cover Letter Generator</h1>
         <p className="text-gray-900 mb-8">
-          Create a professional cover letter tailored to your target company and position.
+          If you want to use your own profile which is more personalized, please sign in and go to <Link href="/profile" className="text-blue-500 hover:text-blue-600">Profile</Link> to upload your resume.
         </p>
       <JobCoverLetterForm/>
       </div>

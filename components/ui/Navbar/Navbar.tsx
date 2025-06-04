@@ -12,21 +12,43 @@ export default function Navbar() {
   const supabase = createClient();
 
   useEffect(() => {
+    let mounted = true;
+
+    // 立即获取用户状态
     const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error('Error getting session:', error);
+          return;
+        }
+        console.log('Current session:', session);
+        if (mounted) {
+          setUser(session?.user ?? null);
+        }
+      } catch (err) {
+        console.error('Error in getUser:', err);
+      }
     };
 
     getUser();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+    // 监听认证状态变化
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth state changed:', event, session);
+      if (mounted) {
+        setUser(session?.user ?? null);
+      }
     });
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
-  }, [supabase.auth]);
+  }, []);
+
+  // 添加调试信息
+  console.log('Navbar render - user state:', user);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200">

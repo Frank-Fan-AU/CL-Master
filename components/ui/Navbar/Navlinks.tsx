@@ -14,23 +14,39 @@ interface NavlinksProps {
 
 export default function Navlinks({ user }: NavlinksProps) {
   const router = getRedirectMethod() === 'client' ? useRouter() : null;
+  const pathname = usePathname();
+
+  // 添加调试信息
+  console.log('Navlinks render - user prop:', user);
 
   return (
-
-      <div className="flex justify-end space-x-8">
-        {user ? (
-          <form onSubmit={(e) => handleRequest(e, SignOut, router)}>
-            <input type="hidden" name="pathName" value={usePathname()} />
-            <button type="submit"  className="text-sm font-medium text-gray-700 hover:text-gray-900">
-              Sign out
-            </button>
-          </form>
-        ) : (
-          <Link href="/signin"  className="text-sm font-medium text-gray-700 hover:text-gray-900">
-            Sign In
-          </Link>
-        )}
-
+    <div className="flex items-center space-x-8">
+      <Link
+        href="/pricing"
+        className="text-sm font-medium text-gray-700 hover:text-gray-900"
+      >
+        Pricing
+      </Link>
+      {user && (
+        <Link
+          href="/profile"
+          className="text-sm font-medium text-gray-700 hover:text-gray-900"
+        >
+          Profile
+        </Link>
+      )}
+      {user ? (
+        <form onSubmit={(e) => handleRequest(e, SignOut, router)} className="m-0">
+          <input type="hidden" name="pathName" value={pathname} />
+          <button type="submit" className="text-sm font-medium text-gray-700 hover:text-gray-900">
+            Sign out
+          </button>
+        </form>
+      ) : (
+        <Link href="/signin" className="text-sm font-medium text-gray-700 hover:text-gray-900">
+          Sign In
+        </Link>
+      )}
     </div>
   );
 }

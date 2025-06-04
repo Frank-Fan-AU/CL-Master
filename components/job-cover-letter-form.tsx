@@ -28,6 +28,8 @@ export default function JobCoverLetterForm() {
     emphasis: ''
   });
 
+  const [userResume, setUserResume] = useState('');
+
   useEffect(() => {
     // 从 localStorage 读取免费生成状态
     const storedFreeGeneration = localStorage.getItem(FREE_GENERATION_KEY);
@@ -40,6 +42,19 @@ export default function JobCoverLetterForm() {
     const checkUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setIsLoggedIn(!!user);
+
+      if (user) {
+        // 获取用户简历信息
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('resume')
+          .eq('id', user.id)
+          .single();
+
+        if (!error && data?.resume) {
+          setUserResume(data.resume);
+        }
+      }
     };
 
     checkUser();
@@ -73,7 +88,8 @@ export default function JobCoverLetterForm() {
         },
         body: JSON.stringify({
           ...formData,
-          isFreeGeneration: !isLoggedIn && hasFreeGeneration
+          isFreeGeneration: !isLoggedIn && hasFreeGeneration,
+          userResume: isLoggedIn ? userResume : undefined
         }),
       });
 
