@@ -1,7 +1,4 @@
 import { Metadata } from 'next';
-import Footer from '@/components/ui/Footer';
-import { Header } from '@/components/ui/Header/header';
-import { Toaster } from '@/components/ui/Toasts/toaster';
 import { PropsWithChildren, Suspense } from 'react';
 import { getURL } from '@/utils/helpers';
 import 'styles/main.css';
