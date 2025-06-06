@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { createClient } from '@/utils/supabase/client';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { updateName, updateEmail, updatePassword } from '@/utils/auth-helpers/server';
 import { handleRequest } from '@/utils/auth-helpers/client';
 import { getRedirectMethod } from '@/utils/auth-helpers/settings';
+import { createStripePortal } from '@/utils/stripe/server';
 
 interface Subscription {
   status: string;
@@ -27,6 +28,8 @@ export default function AccountPage() {
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const currentPath = usePathname();
 
   useEffect(() => {
     let mounted = true;
@@ -137,6 +140,13 @@ export default function AccountPage() {
     }
   };
 
+  const handleStripePortalRequest = async () => {
+    setIsSubmitting(true);
+    const redirectUrl = await createStripePortal(currentPath);
+    setIsSubmitting(false);
+    return router.push(redirectUrl);
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -198,7 +208,8 @@ export default function AccountPage() {
                   {subscription && (
                     <div className="mt-4 grid grid-cols-2 gap-4">
                       <div>
-                        <p className="text-sm font-medium text-gray-900">Next billing date</p>
+                        {subscription.cancel_at_period_end ? <p className="text-sm font-medium text-gray-900">will cancel at</p> : <p className="text-sm font-medium text-gray-900">Next billing date</p>}
+                        
                         <p className="mt-1 text-sm text-gray-500">
                           {new Date(subscription.current_period_end).toLocaleDateString()}
                         </p>
@@ -218,6 +229,7 @@ export default function AccountPage() {
                     <button
                       type="button"
                       className="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                      onClick={handleStripePortalRequest}
                     >
                       Manage Subscription
                     </button>

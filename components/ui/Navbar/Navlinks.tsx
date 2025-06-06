@@ -33,6 +33,16 @@ export default function Navlinks({ user }: NavlinksProps) {
         >
           Profile
         </Link>
+        
+      )}
+      {user && (
+        <Link
+          href="/account"
+          className="text-sm font-medium text-gray-700 hover:text-gray-900"
+        >
+          account
+        </Link>
+        
       )}
       {user ? (
         <form onSubmit={(e) => handleRequest(e, SignOut, router)} className="m-0">
