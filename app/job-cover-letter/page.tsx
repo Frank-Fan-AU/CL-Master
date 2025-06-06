@@ -3,13 +3,23 @@ import JobCoverLetterForm from '@/components/job-cover-letter-form';
 import { Metadata } from 'next';
 import Link from 'next/link';
 // import { JobCoverLetterForm } from '@/components/job-cover-letter-form';
+import {
+  getSubscription,
+  getUser
+} from '@/utils/supabase/queries';
+import { createClient } from '@/utils/supabase/server';
 
 export const metadata: Metadata = {
   title: 'Job Cover Letter - CL-Master',
   description: 'Create professional job cover letters'
 };
 
-export default function JobCoverLetterPage() {
+export default async function JobCoverLetterPage() {
+  const supabase = createClient();
+  const [user, subscription] = await Promise.all([
+    getUser(supabase),
+    getSubscription(supabase)
+  ]);
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="max-w-3xl mx-auto">
@@ -17,7 +27,7 @@ export default function JobCoverLetterPage() {
         <p className="text-gray-900 mb-8">
           If you want to use your own profile which is more personalized, please sign in and go to <Link href="/profile" className="text-blue-500 hover:text-blue-600">Profile</Link> to upload your resume.
         </p>
-      <JobCoverLetterForm/>
+      <JobCoverLetterForm user={user} subscription={subscription}/>
       </div>
     </div>
   );

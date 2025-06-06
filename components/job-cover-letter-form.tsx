@@ -6,18 +6,40 @@ import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Check } from 'lucide-react';
 import { Input } from './ui/input';
 import { Card } from './ui/card';
-import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
+import { User } from '@supabase/supabase-js';
+import { Tables } from '@/types_db';
+import { createClient } from '@/utils/supabase/client';
 
 const FREE_GENERATION_KEY = 'has_free_generation';
 
-export default function JobCoverLetterForm() {
+type Subscription = Tables<'subscriptions'>;
+type Product = Tables<'products'>;
+type Price = Tables<'prices'>;
+
+interface ProductWithPrices extends Product {
+  prices: Price[];
+}
+interface PriceWithProduct extends Price {
+  products: Product | null;
+}
+interface SubscriptionWithProduct extends Subscription {
+  prices: PriceWithProduct | null;
+}
+
+interface Props {
+  user: User | null | undefined;
+  subscription: SubscriptionWithProduct | null;
+}
+
+export default function JobCoverLetterForm({ user, subscription }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [generatedLetter, setGeneratedLetter] = useState('');
   const [error, setError] = useState('');
   const [isCopied, setIsCopied] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [hasFreeGeneration, setHasFreeGeneration] = useState(true);
+  const [remainingGenerations, setRemainingGenerations] = useState(20);
   const router = useRouter();
   const supabase = createClient();
 
@@ -28,58 +50,64 @@ export default function JobCoverLetterForm() {
     emphasis: ''
   });
 
-  const [userResume, setUserResume] = useState('');
-
   useEffect(() => {
-    // 从 localStorage 读取免费生成状态
-    const storedFreeGeneration = localStorage.getItem(FREE_GENERATION_KEY);
-    if (storedFreeGeneration === 'false') {
-      setHasFreeGeneration(false);
-    }
-  }, []);
+    if (user) {
+      setIsLoggedIn(true);
+      // Get total generations count for logged-in users
+      const getGenerationsCount = async () => {
+        try {
+          const { data, error } = await supabase
+            .from('user_generations')
+            .select('count')
+            .eq('user_id', user.id)
+            .maybeSingle(); // 使用 maybeSingle 而不是 single，这样当没有记录时不会报错
 
-  useEffect(() => {
-    const checkUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setIsLoggedIn(!!user);
+          console.log('Generation count data:', data);
+          
+          if (error) {
+            console.error('Error fetching generation count:', error);
+            return;
+          }
 
-      if (user) {
-        // 获取用户简历信息
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('resume')
-          .eq('id', user.id)
-          .single();
+          // 如果没有记录，说明用户还没有生成过，设置剩余次数为20
+          if (!data) {
+            setRemainingGenerations(20);
+            return;
+          }
 
-        if (!error && data?.resume) {
-          setUserResume(data.resume);
+          setRemainingGenerations(Math.max(0, 20 - data.count));
+        } catch (err) {
+          console.error('Error in getGenerationsCount:', err);
         }
+      };
+      getGenerationsCount();
+    } else {
+      // Check free generation for non-logged in users
+      const storedFreeGeneration = localStorage.getItem(FREE_GENERATION_KEY);
+      if (storedFreeGeneration === 'false') {
+        setHasFreeGeneration(false);
       }
-    };
-
-    checkUser();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsLoggedIn(!!session?.user);
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [supabase.auth]);
+    }
+  }, [user, supabase]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // 如果用户未登录且已经使用过免费生成机会，则跳转到登录页面
+
+    // Check generation limits
     if (!isLoggedIn && !hasFreeGeneration) {
+      alert('You have reached your free generation limit. Please sign in to get more generations.');
       router.push('/signin');
+      return;
+    }
+
+    if (isLoggedIn && subscription?.status !== 'active' && remainingGenerations <= 0) {
+      setError('You have reached your generation limit (20 generations). Please subscribe for unlimited generations.');
       return;
     }
 
     setIsLoading(true);
     setError('');
-    
+
     try {
       const response = await fetch('/api/generate-cover-letter', {
         method: 'POST',
@@ -89,7 +117,8 @@ export default function JobCoverLetterForm() {
         body: JSON.stringify({
           ...formData,
           isFreeGeneration: !isLoggedIn && hasFreeGeneration,
-          userResume: isLoggedIn ? userResume : undefined
+          userResume: isLoggedIn ? user?.user_metadata.resume : undefined,
+          userId: isLoggedIn ? user?.id : undefined
         }),
       });
 
@@ -100,11 +129,13 @@ export default function JobCoverLetterForm() {
       }
 
       setGeneratedLetter(data.coverLetter);
-      
-      // 如果是未登录用户，标记已使用免费生成机会并保存到 localStorage
+
+      // Update generation counts
       if (!isLoggedIn && hasFreeGeneration) {
         setHasFreeGeneration(false);
         localStorage.setItem(FREE_GENERATION_KEY, 'false');
+      } else if (isLoggedIn && subscription?.status !== 'active') {
+        setRemainingGenerations(prev => Math.max(0, prev - 1));
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate cover letter. Please try again.');
@@ -118,6 +149,16 @@ export default function JobCoverLetterForm() {
     await navigator.clipboard.writeText(generatedLetter);
     setIsCopied(true);
     setTimeout(() => setIsCopied(false), 2000);
+  };
+
+  const getGenerationLimitText = () => {
+    if (subscription?.status === 'active') {
+      return 'Unlimited generations';
+    }
+    if (isLoggedIn) {
+      return `Remaining generations: ${remainingGenerations}/20`;
+    }
+    return hasFreeGeneration ? '1 free generation remaining' : 'No free generations remaining';
   };
 
   return (
@@ -180,11 +221,11 @@ export default function JobCoverLetterForm() {
           />
         </div>
 
-        {isLoggedIn ? (
-          <Button 
-            type="submit" 
-            className="w-full" 
-            disabled={isLoading}
+        <div className="space-y-2">
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={isLoading || (!isLoggedIn && !hasFreeGeneration) || (isLoggedIn && subscription?.status !== 'active' && remainingGenerations <= 0)}
           >
             {isLoading ? (
               <>
@@ -195,40 +236,19 @@ export default function JobCoverLetterForm() {
               'Generate Cover Letter'
             )}
           </Button>
-        ) : hasFreeGeneration ? (
-          <div className="space-y-2">
-            <Button 
-              type="submit" 
-              className="w-full" 
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                'Generate Free Cover Letter'
-              )}
-            </Button>
-            <p className="text-sm text-gray-500 text-center">
-              You have 1 free generation. Sign in to generate unlimited cover letters.
-            </p>
+          <div className="text-sm text-gray-500 text-center space-y-1">
+            <p>{getGenerationLimitText()}</p>
+            {!isLoggedIn && (
+              <p>Sign in to get 20 generations</p>
+            )}
+            {isLoggedIn && subscription?.status !== 'active' && (
+              <p>Subscribe for unlimited generations</p>
+            )}
+            {isLoggedIn && subscription?.status !== 'active' && remainingGenerations <= 5 && (
+              <p className="text-amber-600">Note: You're running low on generations. Consider subscribing for unlimited access.</p>
+            )}
           </div>
-        ) : (
-          <div className="space-y-2">
-            <Button 
-              type="button" 
-              className="w-full" 
-              onClick={() => router.push('/signin')}
-            >
-              Sign in to Generate More
-            </Button>
-            <p className="text-sm text-gray-500 text-center">
-              You've used your free generation. Sign in to generate more cover letters.
-            </p>
-          </div>
-        )}
+        </div>
 
         {error && (
           <div className="text-red-500 text-sm text-center">
