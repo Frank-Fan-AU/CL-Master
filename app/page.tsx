@@ -40,8 +40,8 @@ export default function Home() {
             </div>
             <div className="bg-gray-50 p-6 rounded-lg shadow-md">
               <div className="text-orange-500 text-2xl mb-4">📝</div>
-              <h3 className="text-xl font-semibold mb-2 text-gray-800">Template Management</h3>
-              <p className="text-gray-600">Save your personal information and preferences for quick cover letter generation</p>
+              <h3 className="text-xl font-semibold mb-2 text-gray-800">Start Easy</h3>
+              <p className="text-gray-600">Just copy and paste the Job Description, and click the button, you will get a cover letter in seconds</p>
             </div>
           </div>
         </div>
@@ -55,8 +55,11 @@ export default function Home() {
             <div className="flex items-center mb-8">
               <div className="bg-orange-500 text-white w-8 h-8 rounded-full flex items-center justify-center mr-4">1</div>
               <div>
-                <h3 className="text-xl font-semibold mb-2 text-gray-800">Upload Your Profile</h3>
-                <p className="text-gray-600">Fill in your education, work experience, and skills</p>
+                <h3 className="text-xl font-semibold mb-2 text-gray-800 flex items-center gap-2">
+                  Upload Your Profile
+                  <span className="text-sm font-normal text-gray-500 bg-gray-100 px-2 py-1 rounded-full">Optional</span>
+                </h3>
+                <p className="text-gray-600">Fill in your education, work experience, and skills for more personalized results</p>
               </div>
             </div>
             <div className="flex items-center mb-8">
@@ -71,6 +74,35 @@ export default function Home() {
               <div>
                 <h3 className="text-xl font-semibold mb-2 text-gray-800">Get Your Cover Letter</h3>
                 <p className="text-gray-600">AI generates a tailored cover letter highlighting your strengths</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Explanation */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">Why We Charge?</h2>
+          <div className="max-w-3xl mx-auto">
+            <div className="bg-gray-50 p-8 rounded-lg shadow-md">
+              <div className="flex items-start gap-4">
+                <div className="text-orange-500 text-2xl">💡</div>
+                <div>
+                  <h3 className="text-xl font-semibold mb-4 text-gray-800">Powered by Advanced AI</h3>
+                  <p className="text-gray-600 mb-4">
+                    Our service uses state-of-the-art AI models to generate high-quality, personalized cover letters. Each generation requires AI tokens, which incur costs from our AI providers.
+                  </p>
+                  <div className="bg-white p-4 rounded-lg border border-gray-200">
+                    <h4 className="font-semibold text-gray-800 mb-2">What You Get:</h4>
+                    <ul className="list-disc list-inside text-gray-600 space-y-2">
+                      <li>Professional, tailored cover letters</li>
+                      <li>Multiple revisions and variations</li>
+                      <li>Industry-specific formatting</li>
+                      <li>Instant generation and delivery</li>
+                    </ul>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
