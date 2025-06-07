@@ -74,12 +74,12 @@ export default function Pricing({ user, products, subscription }: Props) {
     <div className="bg-white py-12 sm:py-16">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
-          <h2 className="text-base font-semibold leading-7 text-orange-600">Pricing</h2>
+          <h2 className="text-4xl font-semibold leading-7 text-orange-600">Pricing</h2>
           <p className="mt-2 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
-            Choose the right plan for you
+            Start Your Career Journey Today
           </p>
         </div>
-        <div className="isolate mx-auto mt-16 grid max-w-md grid-cols-1 gap-y-8 sm:mt-20">
+        <div className="isolate mx-auto mt-10 grid max-w-md grid-cols-1 gap-y-8 sm:mt-20">
           {products.map((product) => {
             const price = product.prices?.find(
               (price) => price.interval === 'month'
@@ -100,17 +100,32 @@ export default function Pricing({ user, products, subscription }: Props) {
                 }`}
               >
                 <div>
-                  <div className="flex items-center justify-between gap-x-4">
+                  <div className="flex items-center justify-center gap-x-4">
                     <h3
-                      className={`text-base font-semibold leading-8 ${
+                      className={`text-3xl font-semibold leading-8 ${
                         product.name === 'Pro' ? 'text-orange-500' : 'text-gray-900'
                       }`}
                     >
                       {product.name}
                     </h3>
                   </div>
-                  <p className="mt-2 text-sm leading-6 text-gray-600">
-                    {product.description || 'Perfect for getting started'}
+                  <p className="mt-2 text-sm leading-6 text-gray-600 space-y-2">
+                    <span className="flex items-center gap-2">
+                      <span className="text-lg">✨</span>
+                      Unlock unlimited cover letter generation with premium features
+                    </span>
+                    <span className="flex items-center gap-2">
+                      <span className="text-lg">🎯</span>
+                      Tailored solutions for job applications (housing, and academic pursuits is coming soon)
+                    </span>
+                    <span className="flex items-center gap-2">
+                      <span className="text-lg">💝</span>
+                      A labor of love from an independent developer, growing with you
+                    </span>
+                    <span className="flex items-center gap-2 text-orange-600 font-medium">
+                      <span className="text-lg">🎉</span>
+                      Wish to help you get your dream job within a month - hope no need to renew! 
+                    </span>
                   </p>
                   <p className="mt-4 flex items-baseline gap-x-1">
                     <span className="text-3xl font-bold tracking-tight text-gray-900">

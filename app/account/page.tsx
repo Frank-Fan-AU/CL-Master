@@ -40,7 +40,7 @@ export default function AccountPage() {
         const { data: { user } } = await supabase.auth.getUser();
         
         if (!mounted) return;
-        
+        console.log(user);
         if (user) {
           setFullName(user.user_metadata.full_name || '');
           setEmail(user.email || null);
