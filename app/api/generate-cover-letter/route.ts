@@ -11,7 +11,7 @@ export async function POST(request: Request) {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
     
-    const { companyName, location, jobRequirements, emphasis, isFreeGeneration, userResume, userId } = await request.json();
+    const { companyName, location, jobRequirements, emphasis, isFreeGeneration } = await request.json();
 
     // 如果用户未登录且不是免费生成，则返回错误
     if (!user && !isFreeGeneration) {
@@ -19,6 +19,20 @@ export async function POST(request: Request) {
         { error: 'Please sign in to generate cover letters' },
         { status: 401 }
       );
+    }
+
+    let userProfileResume = '';
+    // 如果用户已登录，获取用户的简历信息
+    if (user) {
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('resume')
+        .eq('id', user.id)
+        .single();
+      
+      if (profileData?.resume) {
+        userProfileResume = profileData.resume;
+      }
     }
 
     let subscription = null;
@@ -55,7 +69,7 @@ export async function POST(request: Request) {
     Location: ${location}
     Job Requirements: ${jobRequirements}
     Emphasis: ${emphasis}
-    ${userResume ? `Candidate's Resume: ${userResume}` : ''}
+    ${userProfileResume ? `Candidate's Resume: ${userProfileResume}` : ''}
 
     Requirements:
     1. Keep it professional and concise
@@ -64,7 +78,10 @@ export async function POST(request: Request) {
     4. Include a clear call to action
     5. Format it properly with paragraphs
     6. Keep it under 400 words
-    7. If the company is not in the candidate's current location, mention willingness to relocate`;
+    7. If the company is not in the candidate's current location, mention willingness to relocate
+    8. Use the candidate's resume to write the cover letter
+    9. use company's info to write the cover letter
+    10. Use the user's contact information to replace the contact information in the template`;
 
     const completion = await openai.chat.completions.create({
       messages: [{ role: "user", content: prompt }],
