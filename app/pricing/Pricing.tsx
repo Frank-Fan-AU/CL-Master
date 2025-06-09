@@ -4,7 +4,7 @@ import { useState } from 'react';
 import type { Tables } from '@/types_db';
 import { User } from '@supabase/supabase-js';
 import { usePathname, useRouter } from 'next/navigation';
-import { checkoutWithStripe } from '@/utils/stripe/server';
+import { checkoutWithStripe, createStripePortal } from '@/utils/stripe/server';
 import { getStripe } from '@/utils/stripe/client';
 import { getErrorRedirect } from '@/utils/helpers';
 import { Button } from '@/components/ui/button';
@@ -33,6 +33,13 @@ export default function Pricing({ user, products, subscription }: Props) {
     const router = useRouter();
     const [priceIdLoading, setPriceIdLoading] = useState<string>();
     const currentPath = usePathname();
+
+    const handleStripePortalRequest = async () => {
+
+      const redirectUrl = await createStripePortal(currentPath);
+
+      return router.push(redirectUrl);
+    };
     
     const handleStripeCheckout = async (price: Price) => {
         setPriceIdLoading(price.id);
@@ -136,13 +143,25 @@ export default function Pricing({ user, products, subscription }: Props) {
                     </span>
                   </p>
                 </div>
-                <Button       
+                {
+                  subscription ? (
+                    <Button
+                      type="button"
+                      onClick={() => handleStripePortalRequest()}
+                      className="block w-full py-2 mt-8 text-sm font-semibold text-center text-white rounded-md hover:bg-zinc-900"
+                    >
+                      Manage
+                    </Button>
+                  ) : (
+                    <Button       
                       type="button"
                       onClick={() => handleStripeCheckout(price)}
                       className="block w-full py-2 mt-8 text-sm font-semibold text-center text-white rounded-md hover:bg-zinc-900"
                     >
-                      {subscription ? 'Manage' : 'Subscribe'}
+                      Subscribe
                     </Button>
+                  )
+                }
               </div>
             );
           })}

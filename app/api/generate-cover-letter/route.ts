@@ -77,15 +77,19 @@ export async function POST(request: Request) {
     3. Show enthusiasm for the role
     4. Include a clear call to action
     5. Format it properly with paragraphs
-    6. Keep it under 400 words
+    6. Keep it under 500 words
     7. If the company is not in the candidate's current location, mention willingness to relocate
     8. Use the candidate's resume to write the cover letter
     9. use company's info to write the cover letter
-    10. Use the user's contact information to replace the contact information in the template`;
+    10. Use the user's contact information to replace the contact information in the template
+    11. if you need date in the cover letter, use the current date
+    12. put user's information after the cover letter not ahead of it
+    13. you need to Emphasize achievements
+    14. at last, you need to say thank you for your time and consideration`;
 
     const completion = await openai.chat.completions.create({
       messages: [{ role: "user", content: prompt }],
-      model: "gpt-3.5-turbo",
+      model: "gpt-4.1",
     });
 
     const coverLetter = completion.choices[0].message.content;
