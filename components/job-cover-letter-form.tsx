@@ -175,7 +175,7 @@ export default function JobCoverLetterForm({ user, subscription }: Props) {
               onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
               placeholder="Enter company name"
               className="text-gray-900"
-              required
+              
             />
           </div>
           <div className="space-y-2">
@@ -188,7 +188,7 @@ export default function JobCoverLetterForm({ user, subscription }: Props) {
               onChange={(e) => setFormData({ ...formData, location: e.target.value })}
               placeholder="Enter job location"
               className="text-gray-900"
-              required
+              
             />
           </div>
         </div>
@@ -217,7 +217,7 @@ export default function JobCoverLetterForm({ user, subscription }: Props) {
             onChange={(e) => setFormData({ ...formData, emphasis: e.target.value })}
             placeholder="Enter what you'd like to emphasize in your cover letter..."
             className="min-h-[100px] text-gray-900"
-            required
+            
           />
         </div>
 
