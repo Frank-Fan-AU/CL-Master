@@ -142,9 +142,25 @@ export default function AccountPage() {
 
   const handleStripePortalRequest = async () => {
     setIsSubmitting(true);
-    const redirectUrl = await createStripePortal(currentPath);
-    setIsSubmitting(false);
-    return router.push(redirectUrl);
+    setErrorMsg(null);
+    try {
+      const redirectUrl = await createStripePortal(currentPath);
+      if (redirectUrl.startsWith('/error')) {
+        // Parse error information from the URL
+        const errorParams = new URLSearchParams(redirectUrl.split('?')[1]);
+        const errorMessage = errorParams.get('error');
+        const errorDescription = errorParams.get('error_description');
+        setErrorMsg(`${errorMessage}: ${errorDescription}`);
+        return;
+      }
+      setIsSubmitting(false);
+      return router.push(redirectUrl);
+    } catch (error) {
+      console.error('Error accessing Stripe portal:', error);
+      setErrorMsg('Unable to access the subscription management portal. Please try again later or contact support.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (loading) {

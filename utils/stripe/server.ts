@@ -131,7 +131,7 @@ export async function createStripePortal(currentPath: string) {
       if (error) {
         console.error(error);
       }
-      throw new Error('Could not get user session.');
+      throw new Error('Please sign in to access the subscription management portal');
     }
 
     let customer;
@@ -142,11 +142,11 @@ export async function createStripePortal(currentPath: string) {
       });
     } catch (err) {
       console.error(err);
-      throw new Error('Unable to access customer record.');
+      throw new Error('Unable to retrieve your customer information. Please try again later');
     }
 
     if (!customer) {
-      throw new Error('Could not get customer.');
+      throw new Error('Unable to retrieve your customer information. Please try again later');
     }
 
     try {
@@ -155,12 +155,12 @@ export async function createStripePortal(currentPath: string) {
         return_url: getURL('/account')
       });
       if (!url) {
-        throw new Error('Could not create billing portal');
+        throw new Error('Unable to create subscription management portal');
       }
       return url;
     } catch (err) {
       console.error(err);
-      throw new Error('Could not create billing portal');
+      throw new Error('Unable to create subscription management portal. Please try again later');
     }
   } catch (error) {
     if (error instanceof Error) {
@@ -168,13 +168,13 @@ export async function createStripePortal(currentPath: string) {
       return getErrorRedirect(
         currentPath,
         error.message,
-        'Please try again later or contact a system administrator.'
+        'If the issue persists, please contact support'
       );
     } else {
       return getErrorRedirect(
         currentPath,
-        'An unknown error occurred.',
-        'Please try again later or contact a system administrator.'
+        'An unexpected error occurred',
+        'Please try again later or contact support'
       );
     }
   }
