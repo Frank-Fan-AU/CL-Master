@@ -79,13 +79,13 @@ export default function PasswordSignIn({
           </Link>
         </div>
 
-        {allowEmail && (
+        {/* {allowEmail && (
           <div className="text-center">
             <Link href="/signin/email_signin" className="text-gray-600 hover:text-gray-900">
               Sign in via magic link
             </Link>
           </div>
-        )}
+        )} */}
 
         <div className="text-center">
           <Link href="/signin/signup" className="text-gray-600 hover:text-gray-900">
