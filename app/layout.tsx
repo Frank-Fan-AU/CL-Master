@@ -1,3 +1,4 @@
+import { Analytics } from '@vercel/analytics/next';
 import { Metadata } from 'next';
 import { PropsWithChildren, Suspense } from 'react';
 import { getURL } from '@/utils/helpers';
@@ -32,7 +33,7 @@ export default async function RootLayout({ children }: PropsWithChildren) {
         >
           {children}
         </main>
-
+        <Analytics />
       </body>
     </html>
   );
